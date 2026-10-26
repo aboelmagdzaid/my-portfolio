@@ -1,5 +1,5 @@
 (function(){
-var CFG={email:"",whatsapp:""}; // add your email and WhatsApp number (with country code, digits only)
+var CFG={email:"aamtechco@gmail.com",whatsapp:"201094056919"};
 var d=document,b=d.body;
 d.querySelectorAll('[data-split]').forEach(function(el){var i=0;
  (function walk(n){Array.prototype.slice.call(n.childNodes).forEach(function(c){
