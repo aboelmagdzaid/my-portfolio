@@ -5,7 +5,7 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){retur
 function msg(el,t,g){el.textContent=t;el.style.color=g?'#3ddc97':'#ff8a8a'}
 function show(a){$('login').hidden=a;$('dash').hidden=!a;$('out').hidden=!a}
 async function check(){var r=await sb.auth.getSession(),s=r.data.session;
- if(s&&s.user.email===ADMIN){show(true);load()}else{show(false);if(s)await sb.auth.signOut()}}
+ if(s&&s.user.email===ADMIN){show(true);load();loadSv()}else{show(false);if(s)await sb.auth.signOut()}}
 $('lf').addEventListener('submit',async function(e){e.preventDefault();
  var r=await sb.auth.signInWithPassword({email:$('em').value.trim(),password:$('pw').value});
  if(r.error){msg($('lm'),'البريد أو كلمة المرور غير صحيحة',0);return}check()});
@@ -48,5 +48,19 @@ $('list').addEventListener('click',async function(e){var id=e.target.getAttribut
  var paths=(ps.data||[]).map(function(p){return p.image_url}).concat(w.data&&w.data.cover_url?[w.data.cover_url]:[]).map(function(u){var i=u.indexOf('/work-images/');return i>-1?u.slice(i+13):null}).filter(Boolean);
  var r=await sb.from('works').delete().eq('id',id);if(r.error){alert('تعذر الحذف');return}
  if(paths.length)await sb.storage.from('work-images').remove(paths);load()});
+
+async function loadSv(){var c=$('sc2').value,r=await sb.from('services').select('*').eq('category',c).order('sort').order('created_at');
+ if(r.error){$('svl').textContent='تعذر التحميل';return}
+ $('svl').innerHTML=r.data.map(function(s){return '<div class="row" data-id="'+s.id+'"><input class="st" value="'+esc(s.title)+'"><textarea class="sd" style="min-height:70px">'+esc(s.description)+'</textarea><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label style="margin:0">الترتيب</label><input class="so" type="number" value="'+s.sort+'" style="width:90px"><button type="button" class="btn2" data-act="save">حفظ</button><button type="button" class="btn2 del" data-act="del">حذف</button></div></div>'}).join('')||'<p style="color:#93a1c0">لا توجد خدمات.</p>'}
+$('sc2').addEventListener('change',loadSv);
+$('svl').addEventListener('click',async function(e){var act=e.target.getAttribute&&e.target.getAttribute('data-act');if(!act)return;
+ var row=e.target.closest('.row'),id=row.getAttribute('data-id');
+ if(act==='del'){if(!confirm('حذف هذه الخدمة؟'))return;var r=await sb.from('services').delete().eq('id',id);msg($('sm'),r.error?'تعذر الحذف':'تم الحذف',!r.error);loadSv();return}
+ var r2=await sb.from('services').update({title:row.querySelector('.st').value.trim(),description:row.querySelector('.sd').value.trim()||null,sort:parseInt(row.querySelector('.so').value,10)||0}).eq('id',id);
+ msg($('sm'),r2.error?'تعذر الحفظ':'تم حفظ التعديل',!r2.error);loadSv()});
+$('na').addEventListener('click',async function(){var t=$('nt').value.trim();if(!t){msg($('sm'),'اكتب عنوان الخدمة',0);return}
+ var c=$('sc2').value,last=await sb.from('services').select('sort').eq('category',c).order('sort',{ascending:false}).limit(1),n=last.data&&last.data.length?last.data[0].sort+1:0;
+ var r=await sb.from('services').insert({category:c,title:t,description:$('nd').value.trim()||null,sort:n});
+ if(r.error){msg($('sm'),'تعذرت الإضافة',0);return}$('nt').value='';$('nd').value='';msg($('sm'),'تمت إضافة الخدمة',1);loadSv()});
 check();
 })();
