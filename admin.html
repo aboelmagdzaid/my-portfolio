@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>لوحة التحكم</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500&family=Readex+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="adm">
+<nav><div class="wrap"><a class="logo" href="index.html"><span style="display:inline">لوحة التحكم</span></a><div class="links"><a href="index.html">العودة للموقع</a><a id="out" href="#" hidden>تسجيل الخروج</a></div></div></nav>
+<main class="wrap" style="padding-top:110px;padding-bottom:80px">
+<section id="login" class="sec"><form id="lf" class="cform"><h2>دخول المشرف</h2>
+<input id="em" type="email" value="aamtechco@gmail.com" autocomplete="username" required>
+<input id="pw" type="password" placeholder="كلمة المرور" autocomplete="current-password" required>
+<button type="submit">دخول</button><div class="note" id="lm"></div></form></section>
+<div id="dash" hidden>
+<section class="sec"><h2>إضافة عمل جديد</h2>
+<form id="af" class="cform">
+<div><label>المجال</label><select id="cat"><option value="video">المونتاج (فيديو من Google Drive)</option><option value="accounting">المحاسبة (صور وتفاصيل)</option><option value="development">البرمجة (موقع)</option></select></div>
+<div><label>عنوان العمل</label><input id="t" required></div>
+<div><label>وصف قصير</label><textarea id="d" style="min-height:90px"></textarea></div>
+<div data-for="video"><label>رابط الفيديو من Google Drive</label><input id="vu" placeholder="https://drive.google.com/file/d/.../view" dir="ltr"></div>
+<div data-for="development" hidden><label>رابط الموقع</label><input id="su" placeholder="https://www.example.com" dir="ltr"></div>
+<div data-for="development" hidden><label>صورة مخصصة (اختياري، وإلا تُلتقط صورة الموقع تلقائيًا)</label><input id="sc" type="file" accept="image/*"></div>
+<div data-for="accounting" hidden><label>الصور وتفاصيل كل صورة</label><div id="rows" style="display:grid;gap:12px"></div><button type="button" class="btn2" id="add" style="margin-top:12px">+ إضافة صورة</button></div>
+<button type="submit" id="sb">حفظ العمل</button><div class="note" id="am"></div>
+</form></section>
+<section class="sec"><h2>أعمالي المحفوظة</h2><div id="list"></div></section>
+</div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="admin.js"></script>
+</body></html>
