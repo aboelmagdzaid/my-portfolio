@@ -130,3 +130,9 @@ html.intro-on #intro{display:block}
 @keyframes pb{to{transform:scaleX(1)}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.w,.fade,.rv{opacity:1!important;transform:none!important;filter:none!important}#intro{display:none!important}}
 @media(max-width:820px){nav .links>a.cta{display:none}.logo span{display:none}.menu{right:auto;left:0}}
+.site{padding:0;overflow:hidden;display:block}
+.site .bw{display:flex;align-items:center;gap:7px;padding:12px 16px;background:#08122a;border-bottom:1px solid var(--line);direction:ltr}
+.site .bw i{width:9px;height:9px;border-radius:50%;background:#2a3b66}
+.site .bw u{margin-left:10px;text-decoration:none;font-size:.8rem;color:var(--muted);font-family:"Readex Pro",sans-serif}
+.site .bd{padding:30px}
+.site .tg{display:inline-block;font-size:.78rem;color:var(--cy);border:1px solid #17407a;border-radius:99px;padding:2px 14px;margin-bottom:12px}
