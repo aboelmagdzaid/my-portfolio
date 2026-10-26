@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body class="adm">
-<nav><div class="wrap"><a class="logo" href="index.html"><span style="display:inline">لوحة التحكم</span></a><div class="links"><a href="index.html">العودة للموقع</a><a id="out" href="#" hidden>تسجيل الخروج</a></div></div></nav>
+<nav><div class="wrap"><a class="logo" href="/"><span style="display:inline">لوحة التحكم</span></a><div class="links"><a href="/">العودة للموقع</a><a id="out" href="#" hidden>تسجيل الخروج</a></div></div></nav>
 <main class="wrap" style="padding-top:110px;padding-bottom:80px">
 <section id="login" class="sec"><form id="lf" class="cform"><h2>دخول المشرف</h2>
 <input id="em" type="email" value="aamtechco@gmail.com" autocomplete="username" required>
@@ -27,6 +27,12 @@
 <div data-for="accounting" hidden><label>الصور وتفاصيل كل صورة</label><div id="rows" style="display:grid;gap:12px"></div><button type="button" class="btn2" id="add" style="margin-top:12px">+ إضافة صورة</button></div>
 <button type="submit" id="sb">حفظ العمل</button><div class="note" id="am"></div>
 </form></section>
+<section class="sec"><h2>إدارة الخدمات</h2>
+<div class="cform"><div><label>المجال</label><select id="sc2"><option value="video">المونتاج</option><option value="accounting">المحاسبة</option><option value="development">البرمجة</option></select></div>
+<div id="svl" style="display:grid;gap:12px"></div>
+<h3>إضافة خدمة جديدة</h3>
+<input id="nt" placeholder="عنوان الخدمة"><textarea id="nd" placeholder="وصف الخدمة" style="min-height:80px"></textarea>
+<button type="button" id="na">إضافة الخدمة</button><div class="note" id="sm"></div></div></section>
 <section class="sec"><h2>أعمالي المحفوظة</h2><div id="list"></div></section>
 </div>
 </main>
