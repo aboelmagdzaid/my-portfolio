@@ -1,7 +1,7 @@
 (function(){
 var U="https://nicsznqukjjqwkdkuije.supabase.co",K="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5pY3N6bnF1a2pqcXdrZGt1aWplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI5NzA4NTYsImV4cCI6MjEwODU0Njg1Nn0.v6kkYNxSPs8J7P4JnwlKWQvQiD44DgXpbL5fQkHwdgI",d=document;
-var box=d.getElementById('works'),pj=d.getElementById('project');
-if(!box&&!pj)return;
+var box=d.getElementById('works'),pj=d.getElementById('project'),sv=d.getElementById('svc');
+if(!box&&!pj&&!sv)return;
 function q(p){return fetch(U+'/rest/v1/'+p,{headers:{apikey:K,Authorization:'Bearer '+K}}).then(function(r){if(!r.ok)throw 0;return r.json()})}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function ok(u){return /^https?:\/\//i.test(u||'')?u:''}
@@ -10,6 +10,9 @@ function shot(u){return 'https://s.wordpress.com/mshots/v1/'+encodeURIComponent(
 function host(u){try{return new URL(u).hostname.replace(/^www\./,'')}catch(e){return u}}
 function empty(t){return '<div class="empty pop" style="grid-column:1/-1"><h3>'+t+'</h3><p>سيتم عرض الأعمال هنا قريبًا.</p></div>'}
 function fail(){(box||pj).innerHTML=empty('تعذر التحميل')}
+if(sv){q('services?category=eq.'+sv.getAttribute('data-cat')+'&select=*&order=sort.asc,created_at.asc').then(function(r){
+ if(!r.length)return;
+ sv.innerHTML=r.map(function(x,i){return '<div class="card pop" style="--d:'+i+'"><div class="num">'+(i+1)+'</div><h3>'+esc(x.title)+'</h3><p>'+esc(x.description)+'</p></div>'}).join('')}).catch(function(){})}
 if(box){
  var cat=box.getAttribute('data-cat');
  box.innerHTML='<p style="grid-column:1/-1;text-align:center;color:#93a1c0">جاري التحميل...</p>';
@@ -26,7 +29,7 @@ if(box){
    if(cat==='video'){var id=did(w.url),u2=ok(w.url);
     return '<div class="card site pop"'+dl+'>'+(id?'<div class="vid"><iframe loading="lazy" allow="autoplay; fullscreen" allowfullscreen src="https://drive.google.com/file/d/'+id+'/preview"></iframe></div>':'')+'<div class="bd"><span class="tg">فيديو</span><h3>'+t+'</h3><p>'+ds+'</p>'+(u2?'<a class="more" href="'+esc(u2)+'" target="_blank" rel="noopener">فتح في Google Drive ↗</a>':'')+'</div></div>'}
    var ims=map[w.id]||[],cv=ok(w.cover_url)||ims[0]||'';
-   return '<a class="card site pop"'+dl+' href="project.html?id='+esc(w.id)+'">'+(cv?'<div class="shot"><img loading="lazy" alt="'+t+'" src="'+esc(cv)+'"></div>':'')+'<div class="bd"><span class="tg">'+ims.length+' صور</span><h3>'+t+'</h3><p>'+ds+'</p><span class="more">عرض التفاصيل ←</span></div></a>'
+   return '<a class="card site pop"'+dl+' href="/project?id='+esc(w.id)+'">'+(cv?'<div class="shot"><img loading="lazy" alt="'+t+'" src="'+esc(cv)+'"></div>':'')+'<div class="bd"><span class="tg">'+ims.length+' صور</span><h3>'+t+'</h3><p>'+ds+'</p><span class="more">عرض التفاصيل ←</span></div></a>'
   }).join('');
  }).catch(fail);
 }
