@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "scripts": {
+    "db:schema:vercel": "node scripts/apply-schema.js"
+  },
+  "dependencies": {
+    "pg": "^8.16.3"
+  }
+}
