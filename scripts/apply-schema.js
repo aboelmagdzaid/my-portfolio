@@ -18,9 +18,13 @@ async function main() {
 
   const schemaPath = path.join(__dirname, "..", "supabase", "schema.sql");
   const schema = await fs.readFile(schemaPath, "utf8");
+  const caCertificate = process.env.SUPABASE_DB_CA_CERT;
   const client = new Client({
     connectionString,
-    ssl: { rejectUnauthorized: true },
+    ssl: {
+      rejectUnauthorized: true,
+      ...(caCertificate ? { ca: caCertificate.replace(/\\n/g, "\n") } : {}),
+    },
     connectionTimeoutMillis: 15000,
   });
 
@@ -32,6 +36,12 @@ async function main() {
     console.log(`Supabase schema is up to date (connection from ${connectionVariable}).`);
   } catch (error) {
     await client.query("rollback").catch(() => {});
+    if (error.code === "SELF_SIGNED_CERT_IN_CHAIN" || error.code === "UNABLE_TO_VERIFY_LEAF_SIGNATURE") {
+      throw new Error(
+        "Postgres TLS certificate could not be verified. Add the Supabase project's CA certificate as SUPABASE_DB_CA_CERT in Vercel. Do not disable certificate verification.",
+        { cause: error },
+      );
+    }
     throw error;
   } finally {
     await client.end();

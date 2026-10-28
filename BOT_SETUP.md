@@ -17,11 +17,12 @@ The assistant is a separate Vercel serverless feature; it does not change the po
    - `SUPABASE_URL`: the project URL.
    - `SUPABASE_SERVICE_ROLE_KEY`: the service-role key. Keep it private; never add it to browser code or commit it.
    - Database connection: either `SUPABASE_DB_URL` or Vercel's existing `POSTGRES_URL_NON_POOLING`. The migration prefers `SUPABASE_DB_URL` when both are set. Use a valid Supabase Postgres connection string with SSL enabled. Rotate the database password previously shared in chat before using it.
+   - `SUPABASE_DB_CA_CERT`: only if the Production build reports a Postgres TLS certificate-chain error. Download the CA certificate for the project from Supabase Dashboard → Project Settings → Database → SSL Configuration, then save its full PEM contents as this Vercel Production environment variable. Keep certificate verification enabled; do not use `NODE_TLS_REJECT_UNAUTHORIZED=0` or a no-verify connection mode.
    - `TELEGRAM_BOT_TOKEN`: the token from BotFather.
    - `TELEGRAM_WEBHOOK_SECRET`: a random 1–256 character string using only `A-Z`, `a-z`, `0-9`, `_`, and `-`.
    - `BOT_TIMEZONE`: an IANA timezone, default `Africa/Cairo`.
    - `CRON_SECRET`: a long random secret used to authenticate reminder dispatch.
-4. Vercel runs `npm run db:schema:vercel` before each Production deployment. The command uses `SUPABASE_DB_URL` or the already-configured `POSTGRES_URL_NON_POOLING`, applies `supabase/schema.sql` in a transaction, and fails the deployment if the database update fails. Preview deployments skip the database update. Add the same required bot and Supabase API variables to Preview only if you also want to test the webhook there; no Preview database URL is needed.
+4. Vercel runs `npm run db:schema:vercel` before each Production deployment. The command uses `SUPABASE_DB_URL` or the already-configured `POSTGRES_URL_NON_POOLING`, verifies the database TLS certificate (using `SUPABASE_DB_CA_CERT` if configured), applies `supabase/schema.sql` in a transaction, and fails the deployment if the database update fails. Preview deployments skip the database update. Add the same required bot and Supabase API variables to Preview only if you also want to test the webhook there; no Preview database URL is needed.
 5. Deploy the project. Its webhook URL is `https://YOUR_DOMAIN/api/telegram`.
 6. Register the webhook from a trusted PowerShell terminal after setting the token and secret in local environment variables (do not put them in source code or paste the tokenized URL into chat):
 
