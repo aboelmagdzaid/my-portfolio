@@ -17,7 +17,7 @@ The assistant is a separate Vercel serverless feature; it does not change the po
    - `SUPABASE_URL`: the project URL.
    - `SUPABASE_SERVICE_ROLE_KEY`: the service-role key. Keep it private; never add it to browser code or commit it.
    - Database connection: either `SUPABASE_DB_URL` or Vercel's existing `POSTGRES_URL_NON_POOLING`. The migration prefers `SUPABASE_DB_URL` when both are set. Use a valid Supabase Postgres connection string with SSL enabled. Rotate the database password previously shared in chat before using it.
-   - `SUPABASE_DB_CA_CERT`: only if the Production build reports a Postgres TLS certificate-chain error. Download the CA certificate for the project from Supabase Dashboard → Project Settings → Database → SSL Configuration, then save its full PEM contents as this Vercel Production environment variable. Keep certificate verification enabled; do not use `NODE_TLS_REJECT_UNAUTHORIZED=0` or a no-verify connection mode.
+   - `SUPABASE_DB_CA_CERT`: only if the Production build reports a Postgres TLS certificate-chain error. Download the CA certificate for the project from Supabase Dashboard → Project Settings → Database → SSL Configuration, then save its full PEM contents as this Vercel Production environment variable. The migration removes SSL query parameters from the database URL and uses this certificate with hostname verification enabled. Do not use `NODE_TLS_REJECT_UNAUTHORIZED=0` or a no-verify connection mode.
    - `TELEGRAM_BOT_TOKEN`: the token from BotFather.
    - `TELEGRAM_WEBHOOK_SECRET`: a random 1–256 character string using only `A-Z`, `a-z`, `0-9`, `_`, and `-`.
    - `BOT_TIMEZONE`: an IANA timezone, default `Africa/Cairo`.

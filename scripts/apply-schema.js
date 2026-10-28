@@ -19,8 +19,20 @@ async function main() {
   const schemaPath = path.join(__dirname, "..", "supabase", "schema.sql");
   const schema = await fs.readFile(schemaPath, "utf8");
   const caCertificate = process.env.SUPABASE_DB_CA_CERT;
+  const databaseUrl = new URL(connectionString);
+  for (const parameter of [
+    "ssl",
+    "sslmode",
+    "sslrootcert",
+    "sslcert",
+    "sslkey",
+    "sslnegotiation",
+    "uselibpqcompat",
+  ]) {
+    databaseUrl.searchParams.delete(parameter);
+  }
   const client = new Client({
-    connectionString,
+    connectionString: databaseUrl.toString(),
     ssl: {
       rejectUnauthorized: true,
       ...(caCertificate ? { ca: caCertificate.replace(/\\n/g, "\n") } : {}),
