@@ -1,6 +1,6 @@
 # Telegram personal assistant
 
-The assistant is a separate Vercel serverless feature; it does not change the portfolio pages. It supports English and Arabic text, one-time tasks and appointments, daily/weekly repetition, and the `/today`, `/list`, `/done ID`, and `/delete ID` commands. It parses relative dates, weekdays, numeric dates, and times. If no time is given, it uses 9:00 am in the configured timezone; an ambiguous 12-hour time is assumed to be morning.
+The assistant is a separate Vercel serverless feature; it does not change the portfolio pages. It supports English and Arabic reminders, one-time tasks and appointments, daily/weekly repetition, expense and income logging, and current-month money-flow summaries. Reminder commands include `/today`, `/list`, `/done ID`, and `/delete ID`. It parses relative dates, weekdays, numeric dates, and times. If no time is given, it uses 9:00 am in the configured timezone; an ambiguous 12-hour time is assumed to be morning.
 
 ## Set up storage
 
@@ -21,6 +21,7 @@ The assistant is a separate Vercel serverless feature; it does not change the po
    - `TELEGRAM_BOT_TOKEN`: the token from BotFather.
    - `TELEGRAM_WEBHOOK_SECRET`: a random 1–256 character string using only `A-Z`, `a-z`, `0-9`, `_`, and `-`.
    - `BOT_TIMEZONE`: an IANA timezone, default `Africa/Cairo`.
+   - Optional `BOT_LANGUAGE`: set to `ar` to make the automatic monthly report Arabic when no money entries have been recorded yet. Otherwise the report follows the language of the most recently saved transaction.
    - `CRON_SECRET`: a long random secret used to authenticate reminder dispatch.
 4. Vercel runs `npm run db:schema:vercel` before each Production deployment. The command uses `SUPABASE_DB_URL` or the already-configured `POSTGRES_URL_NON_POOLING`, verifies the database TLS certificate (using `SUPABASE_DB_CA_CERT` if configured), applies `supabase/schema.sql` in a transaction, and fails the deployment if the database update fails. Preview deployments skip the database update. Add the same required bot and Supabase API variables to Preview only if you also want to test the webhook there; no Preview database URL is needed.
 5. Deploy the project. Its webhook URL is `https://YOUR_DOMAIN/api/telegram`.
@@ -32,18 +33,25 @@ The assistant is a separate Vercel serverless feature; it does not change the po
      -Body @{ url = "https://YOUR_DOMAIN/api/telegram"; secret_token = $env:TELEGRAM_WEBHOOK_SECRET }
    ```
 
-7. Schedule `GET https://YOUR_DOMAIN/api/reminders` once per minute with a scheduler that supports an `Authorization` header containing the configured cron bearer secret. Vercel's available cron frequency depends on the plan; this project leaves scheduling separate so it can also deploy on plans that do not support minute-level Vercel Cron. You can add a Vercel Cron entry if your plan supports it, or use an external scheduler configured with the same header.
+7. Schedule `GET https://YOUR_DOMAIN/api/reminders` once per minute with a scheduler that supports an `Authorization` header containing the configured cron bearer secret. This sends due reminders, resends unanswered reminders every two hours, and sends the previous month's short money report on the first day of each month. Vercel's available cron frequency depends on the plan; this project leaves scheduling separate so it can also deploy on plans that do not support minute-level Vercel Cron. You can add a Vercel Cron entry if your plan supports it, or use an external scheduler configured with the same header.
 8. Message your bot `/start`.
 
-The webhook rejects requests without Telegram's secret-token header and ignores users other than `TELEGRAM_ALLOWED_USER_ID`. The reminder endpoint requires the cron bearer secret. Supabase's claim function prevents overlapping dispatch runs from claiming the same reminder at once.
+The webhook rejects requests without Telegram's secret-token header and ignores users other than `TELEGRAM_ALLOWED_USER_ID`. At reminder time, choose **Done** to finish it or **Later** to snooze it for one hour. If it is left unanswered, it repeats every two hours. Recurring reminders continue at their next scheduled occurrence when marked done. You may also reply `done` or `later` (or `تم` / `لاحقًا`) to act on your most recently notified reminder. The reminder endpoint requires the cron bearer secret. Supabase claim functions prevent overlapping dispatch runs and duplicate monthly reports.
 
 ## Example messages
 
 - `Remind me to call the dentist tomorrow at 3 pm`
 - `Meeting Friday at 10:30`
 - `Remind me to take medicine every day at 8 am`
+- `I spent 50 EGP on food`
+- `أنا صرفت 50 جنيه اكل`
+- `I earned 10000 EGP from salary`
+- `أخبرني بإجمالي التدفق المالي منذ بداية الشهر`
+- `Detailed money report for last month`
+- `تقرير تفصيلي عن الشهر الماضي`
+- `Short money report`
 - `ذكرني بالاتصال بالطبيب غدًا الساعة ٣ مساءً`
 - `موعد اجتماع يوم الاثنين الساعة ١٠ صباحًا`
 - `ذكرني يوميًا بشرب الماء الساعة ٨`
 
-Only daily and weekly recurrence are supported. Monthly recurrence, rescheduling, and interactive follow-up questions are not included yet.
+Only daily and weekly recurrence are supported. Monthly recurrence, rescheduling, and interactive follow-up questions are not included yet. The money tracker saves each Telegram transaction update once, and reports expenses, income, and net profit from the start of the current month. Totals are grouped by currency so different currencies are never added together.
