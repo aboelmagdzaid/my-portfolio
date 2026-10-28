@@ -8,10 +8,13 @@ async function main() {
     return;
   }
 
-  const connectionString = process.env.SUPABASE_DB_URL;
+  const connectionString = process.env.SUPABASE_DB_URL || process.env.POSTGRES_URL_NON_POOLING;
   if (!connectionString) {
-    throw new Error("SUPABASE_DB_URL is required for Production deployments.");
+    throw new Error("Set SUPABASE_DB_URL or POSTGRES_URL_NON_POOLING for Production deployments.");
   }
+  const connectionVariable = process.env.SUPABASE_DB_URL
+    ? "SUPABASE_DB_URL"
+    : "POSTGRES_URL_NON_POOLING";
 
   const schemaPath = path.join(__dirname, "..", "supabase", "schema.sql");
   const schema = await fs.readFile(schemaPath, "utf8");
@@ -26,7 +29,7 @@ async function main() {
     await client.query("begin");
     await client.query(schema);
     await client.query("commit");
-    console.log("Supabase schema is up to date.");
+    console.log(`Supabase schema is up to date (connection from ${connectionVariable}).`);
   } catch (error) {
     await client.query("rollback").catch(() => {});
     throw error;
