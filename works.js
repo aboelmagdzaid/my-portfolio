@@ -2,6 +2,23 @@
 var U="https://nicsznqukjjqwkdkuije.supabase.co",K="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5pY3N6bnF1a2pqcXdrZGt1aWplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI5NzA4NTYsImV4cCI6MjEwODU0Njg1Nn0.v6kkYNxSPs8J7P4JnwlKWQvQiD44DgXpbL5fQkHwdgI",d=document;
 var box=d.getElementById('works'),pj=d.getElementById('project'),sv=d.getElementById('svc');
 if(!box&&!pj&&!sv)return;
+d.addEventListener('error',function(e){
+ var img=e.target;
+ if(!img||img.tagName!=='IMG')return;
+ var attempt=Number(img.getAttribute('data-retry-count')||0);
+ if(attempt>=3)return;
+ img.setAttribute('data-retry-count',String(attempt+1));
+ var source=img.getAttribute('data-retry-source')||img.currentSrc||img.src;
+ img.setAttribute('data-retry-source',source);
+ setTimeout(function(){
+  if(!img.isConnected)return;
+  var url=new URL(source,d.baseURI);
+  if(url.hostname==='s.wordpress.com'&&url.pathname.indexOf('/mshots/v1/')===0){
+   url.searchParams.set('_retry',String(Date.now()));
+  }
+  img.src=url.href;
+ },[1000,2500,5000][attempt]);
+},true);
 function q(p){return fetch(U+'/rest/v1/'+p,{headers:{apikey:K,Authorization:'Bearer '+K}}).then(function(r){if(!r.ok)throw 0;return r.json()})}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function ok(u){return /^https?:\/\//i.test(u||'')?u:''}
